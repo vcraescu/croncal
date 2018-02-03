@@ -1,0 +1,7 @@
+vendor
+web/assets/node_modules
+web/public/compiled
+.idea
+crontab.txt
+crontab.json
+*.lock

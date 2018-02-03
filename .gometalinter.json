@@ -1,0 +1,43 @@
+{
+  "Vendor": true,
+  "Deadline": "2m",
+  "Sort": [
+    "linter",
+    "severity",
+    "path",
+    "line"
+  ],
+  "EnableGC": true,
+  "Linters": {
+    "nakedret": {
+      "Command": "nakedret",
+      "Pattern": "^(?P<path>.*?\\.go):(?P<line>\\d+)\\s*(?P<message>.*)$"
+    }
+  },
+  "WarnUnmatchedDirective": true,
+  "DisableAll": true,
+  "Enable": [
+    "structcheck",
+    "varcheck",
+    "deadcode",
+    "gocyclo",
+    "gofmt",
+    "goimports",
+    "golint",
+    "gosimple",
+    "ineffassign",
+    "interfacer",
+    "lll",
+    "misspell",
+    "nakedret",
+    "unconvert",
+    "unparam",
+    "unused",
+    "vet",
+    "errcheck",
+    "goconst",
+    "staticcheck"
+  ],
+  "Cyclo": 16,
+  "LineLength": 80
+}
