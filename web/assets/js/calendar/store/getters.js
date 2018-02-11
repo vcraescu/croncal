@@ -3,29 +3,42 @@ import _ from "lodash"
 export const hourlyGrid = ({calendar}, getters) => {
     let grid = []
 
-    calendar.hourly.forEach((row, index) => {
-        if (!grid[index]) {
-            grid[index] = {label: row.label, crons: []}
+    function defaultRow () {
+        let row = {
+            label: null, count: 0, crons: {},
         }
 
-        grid[index].label = row.label
+        getters.crons.forEach((cron) => {
+            row.crons[cron.id] = false
+        })
 
-        row.crons.forEach((id) => {
-            let cron = getters.cron(id),
-                i = index + 1,
-                runtime = cron.runtime - 1
+        return row
+    }
 
-            grid[index].crons.push(id)
+    calendar.hourly.forEach((row, i) => {
+        if (!grid[i]) {
+            grid[i] = defaultRow()
+        }
 
-            while (runtime > 0 && calendar.hourly[i]) {
-                if (!grid[i]) {
-                    grid[i] = {label: null, crons: []}
+        grid[i].label = `:${row.label}`
+
+        getters.crons.forEach((cron) => {
+            let j = i,
+                id = cron.id
+
+            if (row.crons.indexOf(id) === -1) {
+                return
+            }
+
+            _.forEach(_.range(0, cron.runtime), () => {
+                if (!grid[j]) {
+                    grid[j] = defaultRow()
                 }
 
-                grid[i].crons.push(id)
-                runtime--
-                i++
-            }
+                grid[j].crons[id] = true
+                grid[j].count++
+                j++
+            })
         })
     })
 
@@ -36,6 +49,14 @@ export const crons = ({crons}) => {
     return crons
 }
 
-export const cron = ({crons}) => (id) => {
+export const findCron = ({crons}) => (id) => {
+    if (!id) {
+        return
+    }
+
     return _.find(crons, (cron) => cron.id === id)
+}
+
+export const isLoading = ({loading}) => {
+    return loading
 }

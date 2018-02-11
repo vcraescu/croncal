@@ -27,7 +27,7 @@ func (g Grid) Crons() []crontab.Cron {
 		i++
 	}
 
-	sort.Sort(crontab.CronsByID(crons))
+	sort.Sort(crontab.CronsByPosition(crons))
 
 	return crons
 }

@@ -1,18 +1,5 @@
-@import "~bootstrap/scss/bootstrap";
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons');
 
-body {
-  font-size: 0.8rem;
+.clickable {
+  cursor: pointer;
 }
-
-.calendar {
-  padding: 1em;
-
-  table {
-    thead {
-      th:first-child {
-        width: 100px;
-      }
-    }
-  }
-}
-

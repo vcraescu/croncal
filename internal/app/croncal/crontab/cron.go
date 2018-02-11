@@ -9,23 +9,24 @@ import (
 // Cron represents a cron from crontab
 type Cron struct {
 	ID       string `json:"id"`
-	Interval string `json:"interval"`
-	Cmd      string `json:"cmd"`
-	Name     string `json:"name"`
-	Runtime  uint   `json:"runtime"`
+	Interval string `json:"interval" validate:"required"`
+	Cmd      string `json:"cmd" validate:"required"`
+	Name     string `json:"name" validate:"required"`
+	Runtime  uint   `json:"runtime" validate:"required"`
+	Position uint   `json:"position" validate:"required"`
 }
 
-// CronsByID type for sorting crons by ID
-type CronsByID []Cron
+// CronsByPosition type for sorting crons by ID
+type CronsByPosition []Cron
 
-func (s CronsByID) Len() int {
-	return len(s)
+func (c CronsByPosition) Len() int {
+	return len(c)
 }
-func (s CronsByID) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
+func (c CronsByPosition) Swap(i, j int) {
+	c[i], c[j] = c[j], c[i]
 }
-func (s CronsByID) Less(i, j int) bool {
-	return s[i].ID < s[j].ID
+func (c CronsByPosition) Less(i, j int) bool {
+	return c[i].Position < c[j].Position
 }
 
 // NewCron return a new Cron

@@ -14,6 +14,7 @@ const
                 hourly: [],
             },
             crons: [],
+            loading: false,
         },
         typeof window.initialState === "object" ? window.initialState : {},
     )

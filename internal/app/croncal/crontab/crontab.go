@@ -8,7 +8,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -58,9 +57,8 @@ func FromCronTabFile(filename string) (*Tab, error) {
 
 	t := New()
 	r := bufio.NewReader(f)
-	i := 0
+	var i uint
 	for {
-		i++
 		l, err := r.ReadString('\n')
 		if err == io.EOF {
 			break
@@ -78,6 +76,7 @@ func FromCronTabFile(filename string) (*Tab, error) {
 		}
 
 		err = t.AddLine(i, interval, cmd)
+		i++
 		if err != nil {
 			log.Errorln(err)
 		}
@@ -110,10 +109,11 @@ func (t *Tab) Add(c Cron) {
 }
 
 // AddLine creates a new Cron from interval and command parts and adds it Tab
-func (t *Tab) AddLine(position int, interval, cmd string) (error) {
+func (t *Tab) AddLine(position uint, interval, cmd string) (error) {
 	c := NewCron(interval, cmd)
 
-	c.ID = uuid.NewV3(uuid.NamespaceOID, strconv.Itoa(position)).String()
+	c.ID = uuid.NewV4().String()
+	c.Position = position
 
 	t.Add(*c)
 

@@ -1,5 +1,29 @@
 {
-  "presets": ["env"],
-  "plugins": ["transform-object-rest-spread", "transform-runtime"],
+  "presets": [
+    [
+      "env"
+    ],
+    [
+      "es2015",
+      {
+        "modules": false
+      }
+    ]
+  ],
+  "plugins": [
+    [
+      "transform-object-rest-spread"
+    ],
+    [
+      "transform-runtime"
+    ],
+    [
+      "component",
+      {
+        "libraryName": "element-ui",
+        "styleLibraryName": "theme-chalk"
+      }
+    ]
+  ],
   "comments": false
 }

@@ -30,5 +30,7 @@ func Start(e *echo.Echo, ctx Context, address string) error {
 	g.GET("/crons", es.crons)
 	g.PUT("/crons/:id", es.updateCron)
 
+	e.Validator = newEntityValidator()
+
 	return e.Start(address)
 }

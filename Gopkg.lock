@@ -2,6 +2,22 @@
 
 
 [[projects]]
+  name = "github.com/go-playground/locales"
+  packages = [
+    ".",
+    "currency",
+    "en"
+  ]
+  revision = "e4cbcb5d0652150d40ad0646651076b6bd2be4f6"
+  version = "v0.11.2"
+
+[[projects]]
+  name = "github.com/go-playground/universal-translator"
+  packages = ["."]
+  revision = "b32fa301c9fe55953584134cb6853a13c87ec0a1"
+  version = "v0.16.0"
+
+[[projects]]
   name = "github.com/gorhill/cronexpr"
   packages = ["."]
   revision = "a557574d6c024ed6e36acc8b610f5f211c91568a"
@@ -84,6 +100,15 @@
   revision = "8f27ce8a604014414f8dfffc25cbcde83a3f2216"
 
 [[projects]]
+  name = "gopkg.in/go-playground/validator.v9"
+  packages = [
+    ".",
+    "translations/en"
+  ]
+  revision = "535f85221eb67ab842438877b22cac6274380cf2"
+  version = "v9.10.0"
+
+[[projects]]
   name = "gopkg.in/urfave/cli.v1"
   packages = ["."]
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
@@ -92,6 +117,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c5ab65c179c39545426bccf227bce25223b88c217672b1d315ebbdc6d1751b22"
+  inputs-digest = "d54626070eaddd544628a1e60342454a22f778e681b82285f656ac047cd0f6e5"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -14,6 +14,10 @@ export default {
 
         delete data.id
 
+        if (data.runtime <= 0) {
+            data.runtime = 1;
+        }
+
         return axios.put(`/api/v1/crons/${id}`, data)
     }
 }

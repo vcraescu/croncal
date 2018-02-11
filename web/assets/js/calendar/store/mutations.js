@@ -22,3 +22,7 @@ export const updateCron = (state, payload) => {
     state.crons[i].name = payload.name
     state.crons[i].ID = payload.ID
 }
+
+export const toggleLoading = (state) => {
+    state.loading = !state.loading
+}

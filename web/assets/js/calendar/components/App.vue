@@ -1,21 +1,45 @@
 <template>
-    <div class="calendar">
-        <h1>Cron Calendar</h1>
+    <v-app>
+        <progress-bar v-if="isLoading"></progress-bar>
+        <notification delay="5"></notification>
 
-        <c-calendar/>
-    </div>
+        <v-content>
+            <v-container fluid>
+                <v-tabs
+                        color="light-blue darken-3"
+                        dark
+                        slider-color="orange">
+                    <v-tab ripple key="hourly">
+                        Hourly
+                    </v-tab>
+
+                    <v-tab-item key="hourly">
+                        <hourly-grid/>
+                    </v-tab-item>
+                </v-tabs>
+            </v-container>
+        </v-content>
+    </v-app>
 </template>
 
 <script>
-    import Calendar from "./Calendar.vue"
-    import { mapActions } from "vuex"
+    import ProgressBar from "./ProgressBar.vue"
+    import HourlyGrid from "./HourlyGrid.vue"
+    import { mapActions, mapGetters } from "vuex"
 
     export default {
         created () {
             this.fetchCrons()
         },
+
         components: {
-            CCalendar: Calendar,
+            ProgressBar,
+            HourlyGrid,
+        },
+        computed: {
+            ...mapGetters([
+                "isLoading"
+            ])
         },
         methods: {
             ...mapActions([

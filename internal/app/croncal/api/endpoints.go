@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/vcraescu/croncal/internal/app/croncal/calendar"
 	"github.com/vcraescu/croncal/internal/app/croncal/crontab"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type endpoints struct {
@@ -15,10 +16,12 @@ type endpoints struct {
 }
 
 type cronResponse struct {
-	ID      string `json:"id"`
-	Name    string `json:"name"`
-	Cmd     string `json:"cmd"`
-	Runtime uint   `json:"runtime"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Cmd      string `json:"cmd"`
+	Runtime  uint   `json:"runtime"`
+	Position uint   `json:"position"`
+	Interval string `json:"interval"`
 }
 
 type gridRowResponse struct {
@@ -45,7 +48,7 @@ func (e endpoints) crons(ctx echo.Context) error {
 		i++
 	}
 
-	sort.Sort(crontab.CronsByID(crons))
+	sort.Sort(crontab.CronsByPosition(crons))
 
 	for i, c := range crons {
 		r[i] = newCronResponse(c)
@@ -68,6 +71,14 @@ func (e endpoints) updateCron(ctx echo.Context) error {
 
 	if err = ctx.Bind(c); err != nil {
 		return err
+	}
+
+	if err = ctx.Validate(c); err != nil {
+		return ctx.JSON(http.StatusUnprocessableEntity, newInvalidEntityResponse(err))
+	}
+
+	if c.Runtime <= 0 {
+		c.Runtime = 0
 	}
 
 	err = ct.ExportToJSON(e.app.ctx.CronTabJSONFilename)
@@ -109,9 +120,27 @@ func (e endpoints) hourly(ctx echo.Context) error {
 
 func newCronResponse(c crontab.Cron) cronResponse {
 	return cronResponse{
-		ID:      c.ID,
-		Name:    c.Name,
-		Cmd:     c.Cmd,
-		Runtime: c.Runtime,
+		ID:       c.ID,
+		Name:     c.Name,
+		Cmd:      c.Cmd,
+		Runtime:  c.Runtime,
+		Position: c.Position,
+		Interval: c.Interval,
 	}
+}
+
+func newInvalidEntityResponse(err error) map[string][]string {
+	errs := make(map[string][]string)
+
+	vErrs, _ := err.(validator.ValidationErrors)
+	for _, vErr := range vErrs {
+		name := vErr.Field()
+		if _, ok := errs[name]; !ok {
+			errs[name] = make([]string, 0)
+		}
+
+		errs[name] = append(errs[name], vErr.Translate(validatorTranslator))
+	}
+
+	return errs
 }

@@ -24,6 +24,7 @@
 #   go-tests = true
 #   unused-packages = true
 
+required = ["gopkg.in/go-playground/validator.v9/translations/en"]
 
 [prune]
   go-tests = true
@@ -52,3 +53,15 @@
 [[constraint]]
   name = "gopkg.in/urfave/cli.v1"
   version = "1.20.0"
+
+[[constraint]]
+  name = "gopkg.in/go-playground/validator.v9"
+  version = "9.10.0"
+
+[[constraint]]
+  name = "github.com/go-playground/universal-translator"
+  version = "0.16.0"
+
+[[constraint]]
+  name = "github.com/go-playground/locales"
+  version = "0.11.2"
