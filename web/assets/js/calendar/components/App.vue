@@ -38,8 +38,8 @@
         },
         computed: {
             ...mapGetters([
-                "isLoading"
-            ])
+                "isLoading",
+            ]),
         },
         methods: {
             ...mapActions([

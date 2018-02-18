@@ -10,6 +10,8 @@ export default {
     },
 
     updateCron(data) {
+        data = {...data}
+
         let id = data.id
 
         delete data.id

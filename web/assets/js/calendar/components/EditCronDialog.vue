@@ -26,6 +26,7 @@
                             :value="value.interval"
                             :rules="validationRules.interval"
                             required
+                            @input="onInputInterval"
                     ></interval-field>
                     <v-text-field
                             label="Command"
@@ -57,6 +58,7 @@
         data () {
             return {
                 valid: true,
+                form: {},
                 validationRules: {
                     name: [
                         v => !!v || "Name is required",
@@ -84,9 +86,9 @@
                         ],
                         monthOfYear: [
                             v => !!v || "Month is required",
-                        ]
-                    }
-                }
+                        ],
+                    },
+                },
             }
         },
 
@@ -116,26 +118,44 @@
                     return
                 }
 
-                this.$emit("save", this.form)
+                this.$emit("save")
             },
 
-            onInputName(value) {
-                this.$emit("input", Object.assign({}, this.value, {
-                    name: value,
-                }))
+            onInputName (name) {
+                let data = {
+                    ...this.value,
+                    name,
+                }
+
+                this.$emit("input", data)
             },
 
-            onInputCommand(value) {
-                this.$emit("input", Object.assign({}, this.value, {
-                    cmd: value,
-                }))
+            onInputCommand (cmd) {
+                let data = {
+                    ...this.value,
+                    cmd,
+                }
+
+                this.$emit("input", data)
             },
 
-            onInputRuntime(value) {
-                this.$emit("input", Object.assign({}, this.value, {
-                    runtime: Number(value),
-                }))
-            }
-        }
+            onInputRuntime (runtime) {
+                let data = {
+                    ...this.value,
+                    runtime,
+                }
+
+                this.$emit("input", data)
+            },
+
+            onInputInterval (interval) {
+                let data = {
+                    ...this.value,
+                    interval,
+                }
+
+                this.$emit("input", data)
+            },
+        },
     }
 </script>

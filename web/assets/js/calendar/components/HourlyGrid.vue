@@ -76,7 +76,7 @@
                     id: null,
                     interval: "",
                     runtime: null,
-                    position: null
+                    position: null,
                 },
             }
         },

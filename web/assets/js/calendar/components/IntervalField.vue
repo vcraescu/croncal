@@ -83,7 +83,7 @@
 
         data () {
             return {
-                hasErrors: false
+                hasErrors: false,
             }
         },
 

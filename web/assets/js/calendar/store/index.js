@@ -19,7 +19,6 @@ const
         typeof window.initialState === "object" ? window.initialState : {},
     )
 
-
 export default new Vuex.Store({
     state,
     actions,

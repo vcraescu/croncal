@@ -12,9 +12,9 @@
             color: {
                 type: String,
                 required: false,
-                default: "orange"
-            }
-        }
+                default: "orange",
+            },
+        },
     }
 </script>
 
