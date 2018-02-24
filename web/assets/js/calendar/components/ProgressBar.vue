@@ -1,21 +1,23 @@
 <template>
-    <div class="progress-bar">
-        <v-progress-linear :indeterminate="true" :color="color"></v-progress-linear>
-    </div>
+  <div class="progress-bar">
+    <v-progress-linear 
+      :indeterminate="true" 
+      :color="color"/>
+  </div>
 </template>
 
 <script>
-    export default {
-        name: "progress-bar",
+export default {
+    name: 'ProgressBar',
 
-        props: {
-            color: {
-                type: String,
-                required: false,
-                default: "orange",
-            },
+    props: {
+        color: {
+            type: String,
+            required: false,
+            default: 'orange',
         },
-    }
+    },
+}
 </script>
 
 <style lang="scss" scoped>

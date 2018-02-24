@@ -1,44 +1,44 @@
-import calendarApi from "./../api/calendar"
+import calendarApi from './../api/calendar'
 
 export const fetchCrons = async ({commit}) => {
-    commit("toggleLoading")
+    commit('toggleLoading')
 
     try {
         let r = await calendarApi.crons()
 
-        commit("updateCrons", r.data)
+        commit('updateCrons', r.data)
 
         return r
     } finally {
-        commit("toggleLoading")
+        commit('toggleLoading')
     }
 }
 
 export const fetchHourlyGrid = async ({commit}) => {
-    commit("toggleLoading")
+    commit('toggleLoading')
 
     try {
         let r = await calendarApi.hourly()
 
-        commit("updateHourlyCalendar", r.data.rows)
+        commit('updateHourlyCalendar', r.data.rows)
 
         return r
     } finally {
-        commit("toggleLoading")
+        commit('toggleLoading')
     }
 }
 
 export const updateCron = async ({commit}, cron) => {
-    commit("toggleLoading")
+    commit('toggleLoading')
 
     try {
         let r = await calendarApi.updateCron(cron)
 
-        commit("updateCron", r.data)
+        commit('updateCron', r.data)
 
         return r
     } finally {
-        commit("toggleLoading")
+        commit('toggleLoading')
     }
 }
 

@@ -15,15 +15,6 @@ type endpoints struct {
 	app application
 }
 
-type cronResponse struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Cmd      string `json:"cmd"`
-	Runtime  uint   `json:"runtime"`
-	Position uint   `json:"position"`
-	Interval string `json:"interval"`
-}
-
 type gridRowResponse struct {
 	Label string   `json:"label"`
 	Crons []string `json:"crons"`
@@ -33,6 +24,11 @@ type gridResponse struct {
 	Rows []gridRowResponse `json:"rows"`
 }
 
+type unprocessableEntityResponse struct {
+	Message string `json:"message"`
+	Errors  map[string][]string `json:"errors"`
+}
+
 func (e endpoints) crons(ctx echo.Context) error {
 	ct, err := crontab.FromJSONFile(e.app.ctx.CronTabJSONFilename)
 	if err != nil {
@@ -40,7 +36,6 @@ func (e endpoints) crons(ctx echo.Context) error {
 	}
 
 	crons := make([]crontab.Cron, len(ct.Crons))
-	r := make([]cronResponse, len(ct.Crons))
 
 	i := 0
 	for _, c := range ct.Crons {
@@ -50,11 +45,7 @@ func (e endpoints) crons(ctx echo.Context) error {
 
 	sort.Sort(crontab.CronsByPosition(crons))
 
-	for i, c := range crons {
-		r[i] = newCronResponse(c)
-	}
-
-	return ctx.JSON(http.StatusOK, r)
+	return ctx.JSON(http.StatusOK, crons)
 }
 
 func (e endpoints) updateCron(ctx echo.Context) error {
@@ -74,7 +65,7 @@ func (e endpoints) updateCron(ctx echo.Context) error {
 	}
 
 	if err = ctx.Validate(c); err != nil {
-		return ctx.JSON(http.StatusUnprocessableEntity, newInvalidEntityResponse(err))
+		return ctx.JSON(http.StatusUnprocessableEntity, newUnprocessableEntityResponse(err))
 	}
 
 	if c.Runtime <= 0 {
@@ -86,7 +77,7 @@ func (e endpoints) updateCron(ctx echo.Context) error {
 		return err
 	}
 
-	return ctx.JSON(http.StatusOK, newCronResponse(*c))
+	return ctx.JSON(http.StatusOK, c)
 }
 
 func (e endpoints) hourly(ctx echo.Context) error {
@@ -118,29 +109,21 @@ func (e endpoints) hourly(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, r)
 }
 
-func newCronResponse(c crontab.Cron) cronResponse {
-	return cronResponse{
-		ID:       c.ID,
-		Name:     c.Name,
-		Cmd:      c.Cmd,
-		Runtime:  c.Runtime,
-		Position: c.Position,
-		Interval: c.Interval,
+func newUnprocessableEntityResponse(err error) unprocessableEntityResponse {
+	r := unprocessableEntityResponse{
+		Message: "Please correct the errors",
+		Errors: make(map[string][]string),
 	}
-}
-
-func newInvalidEntityResponse(err error) map[string][]string {
-	errs := make(map[string][]string)
 
 	vErrs, _ := err.(validator.ValidationErrors)
 	for _, vErr := range vErrs {
 		name := vErr.Field()
-		if _, ok := errs[name]; !ok {
-			errs[name] = make([]string, 0)
+		if _, ok := r.Errors[name]; !ok {
+			r.Errors[name] = make([]string, 0)
 		}
 
-		errs[name] = append(errs[name], vErr.Translate(validatorTranslator))
+		r.Errors[name] = append(r.Errors[name], vErr.Translate(validatorTranslator))
 	}
 
-	return errs
+	return r
 }

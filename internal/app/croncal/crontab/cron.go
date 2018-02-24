@@ -9,14 +9,14 @@ import (
 // Cron represents a cron from crontab
 type Cron struct {
 	ID       string `json:"id"`
-	Interval string `json:"interval" validate:"required"`
-	Cmd      string `json:"cmd" validate:"required"`
-	Name     string `json:"name" validate:"required"`
-	Runtime  uint   `json:"runtime" validate:"required"`
+	Interval string `json:"interval" validate:"required,min=9,interval"`
+	Cmd      string `json:"cmd" validate:"required,min=4"`
+	Name     string `json:"name" validate:"required,min=2"`
+	Runtime  uint   `json:"runtime" validate:"required,min=0,max=59"`
 	Position uint   `json:"position" validate:"required"`
 }
 
-// CronsByPosition type for sorting crons by ID
+// CronsByPosition type for sorting crons by Position
 type CronsByPosition []Cron
 
 func (c CronsByPosition) Len() int {

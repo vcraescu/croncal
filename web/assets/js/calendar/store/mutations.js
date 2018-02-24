@@ -1,4 +1,4 @@
-import _ from "lodash"
+import _ from 'lodash'
 
 export const updateHourlyCalendar = (state, payload) => {
     state.calendar.hourly = payload
