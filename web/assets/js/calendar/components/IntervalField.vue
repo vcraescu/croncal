@@ -64,7 +64,9 @@
       <div
         v-for="(message, index) in errorMessages"
         :key="index"
-        class="input-group__messages input-group__error error--text">{{ message }}</div>
+        class="input-group__messages input-group__error error--text">
+        {{ message }}
+      </div>
     </div>
   </div>
 </template>

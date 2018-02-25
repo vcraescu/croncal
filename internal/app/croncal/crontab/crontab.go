@@ -108,6 +108,16 @@ func (t *Tab) Add(c Cron) {
 	t.Crons[c.ID] = &c
 }
 
+// Len returns number of crons
+func (t *Tab) Len() int {
+	return len(t.Crons)
+}
+
+// Empty returns if there are no registered crons
+func (t *Tab) Empty() bool {
+	return t.Len() == 0
+}
+
 // AddLine creates a new Cron from interval and command parts and adds it Tab
 func (t *Tab) AddLine(position uint, interval, cmd string) (error) {
 	c := NewCron(interval, cmd)

@@ -13,7 +13,7 @@
         <tr class="blue-grey darken-4 white--text">
           <th class="white--text sticky-col">:mm</th>
           <th
-            class="white--text clickable"
+            class="white--text clickable cron"
             v-for="header in props.headers"
             :key="header.id"
             @click="onEdit(header.id)">
@@ -21,7 +21,7 @@
               bottom 
               max-width="300" 
               color="blue-grey darken-4">
-              <span slot="activator">{{ header.text }}</span>
+              <span slot="activator">{{ cronName(header.text) }}</span>
               <span>{{ header.tooltip }}</span>
             </v-tooltip>
           </th>
@@ -120,6 +120,13 @@ export default {
             'fetchHourlyGrid',
             'updateCron',
         ]),
+        cronName(name) {
+            if (!name || name.length < 64) {
+                return name
+            }
+
+            return `${name.substr(0, 19)} ... ${name.substr(-48)}`
+        },
         toggleCronEditDialog () {
             this.editCronDialogVisible = !this.editCronDialogVisible
         },
@@ -136,16 +143,10 @@ export default {
             this.toggleCronEditDialog()
         },
         onSaveEditCronDialog () {
-            let cron = this.findCron(this.editingCron.id)
-            if (!cron) {
-                return
-            }
-
             this.editCronErrors = {}
             this.updateCron(this.editingCron).then(() => {
                 this.$notification.success('Cron data successfully saved')
                 this.toggleCronEditDialog()
-
             }).catch(({response}) => {
                 if (response.status > 499 || !response.data ||
                     !response.data.message

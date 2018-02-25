@@ -10,15 +10,15 @@ import (
 	"github.com/vcraescu/croncal/internal/app/croncal/api"
 	"github.com/vcraescu/croncal/internal/app/croncal/crontab"
 	"gopkg.in/urfave/cli.v1"
+	"github.com/gobuffalo/packr"
+	"fmt"
 )
 
-const cronTabJSONFilename = "crontab.json"
-
 func initStatics(e *echo.Echo) {
-	fs := http.FileServer(http.Dir("./web/public"))
+	box := packr.NewBox("../../web/public")
+	fs := http.FileServer(box)
 
-	e.GET("/", echo.WrapHandler(fs))
-	e.GET("/compiled/*", echo.WrapHandler(fs))
+	e.GET("/*", echo.WrapHandler(fs))
 }
 
 func newCLIApp() *cli.App {
@@ -64,25 +64,46 @@ func main() {
 			return err
 		}
 
-		if _, err := os.Stat(cronTabJSONFilename); os.IsNotExist(err) {
-			err = tab.ExportToJSON(cronTabJSONFilename)
-			if err != nil {
-				return err
-			}
+		if tab.Empty() {
+			return errors.New("crontab is empty")
+		}
+
+		jsonFilename, err := crontabJSONFilename(filename)
+		if err != nil {
+			return err
+		}
+
+		err = tab.ExportToJSON(jsonFilename)
+		if err != nil {
+			return err
 		}
 
 		e := echo.New()
+		e.Debug = c.Bool("debug")
 		initStatics(e)
 
 		ctx := api.Context{}
 		ctx.Prefix = "/api/v1"
-		ctx.CronTabJSONFilename = cronTabJSONFilename
+		ctx.CronTabJSONFilename = jsonFilename
 
 		return api.Start(e, ctx, c.String("bind"))
 	}
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Fprintf(os.Stderr, "Error: %s", err)
 	}
 }
+
+func crontabJSONFilename(filename string) (string, error) {
+	filename = fmt.Sprintf("%s.json", filename)
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		return filename, nil
+	}
+
+	return "", fmt.Errorf(
+		"file %s already exists on disk. Please delete it and try again",
+		filename,
+	)
+}
+

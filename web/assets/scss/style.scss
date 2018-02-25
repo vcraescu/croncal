@@ -3,3 +3,13 @@
 .clickable {
   cursor: pointer;
 }
+
+table {
+ th {
+   &.cron {
+     max-width: 400px;
+     overflow-wrap: break-word;
+     overflow: hidden;
+   }
+ }
+}

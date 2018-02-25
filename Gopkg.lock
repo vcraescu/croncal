@@ -18,6 +18,12 @@
   version = "v0.16.0"
 
 [[projects]]
+  name = "github.com/gobuffalo/packr"
+  packages = ["."]
+  revision = "6434a292ac52e6964adebfdce3f9ce6d9f16be01"
+  version = "v1.10.4"
+
+[[projects]]
   name = "github.com/gorhill/cronexpr"
   packages = ["."]
   revision = "a557574d6c024ed6e36acc8b610f5f211c91568a"
@@ -49,6 +55,12 @@
   packages = ["."]
   revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
   version = "v0.0.3"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   name = "github.com/satori/go.uuid"
@@ -117,6 +129,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d54626070eaddd544628a1e60342454a22f778e681b82285f656ac047cd0f6e5"
+  inputs-digest = "7f7f05a33ec75b81ba17cae242bd0cab7f85ca547bd4c67fa6c26ecd3d151458"
   solver-name = "gps-cdcl"
   solver-version = 1

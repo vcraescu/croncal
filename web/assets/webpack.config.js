@@ -4,11 +4,11 @@ const
     merge = require('webpack-merge'),
     webPath = path.resolve(__dirname, '../public'),
     ExtractTextPlugin = require('extract-text-webpack-plugin'),
+    CleanWebpackPlugin = require('clean-webpack-plugin'),
 
     extractSass = new ExtractTextPlugin({
         filename: '[name].min.css',
     })
-
 
 const common = {
     context: path.resolve(__dirname),
@@ -162,6 +162,9 @@ if (process.env.NODE_ENV === 'production') {
             output: {
                 comments: false,
             },
+        }),
+        new CleanWebpackPlugin(['hot-update'], {
+            root: path.resolve(__dirname, '../public/compiled'),
         }),
     ])
 }
