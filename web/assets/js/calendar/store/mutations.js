@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import Vue from 'vue'
 
 export const updateHourlyCalendar = (state, payload) => {
     state.calendar.hourly = payload
@@ -17,10 +18,7 @@ export const updateCrons = (state, crons) => {
 export const updateCron = (state, payload) => {
     let i = _.findIndex(state.crons, (cron) => cron.id === payload.id)
 
-    state.crons[i].runtime = payload.runtime
-    state.crons[i].cmd = payload.cmd
-    state.crons[i].name = payload.name
-    state.crons[i].ID = payload.ID
+    Vue.set(state.crons, i, payload)
 }
 
 export const toggleLoading = (state) => {

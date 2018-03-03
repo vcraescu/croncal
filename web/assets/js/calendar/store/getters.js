@@ -46,7 +46,7 @@ export const hourlyGrid = ({calendar}, getters) => {
 }
 
 export const crons = ({crons}) => {
-    return crons
+    return _.sortBy(crons, ['position'])
 }
 
 export const findCron = ({crons}) => (id) => {

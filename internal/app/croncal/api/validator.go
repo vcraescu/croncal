@@ -7,7 +7,7 @@ import (
 	"github.com/go-playground/universal-translator"
 	"reflect"
 	"strings"
-	"regexp"
+	"github.com/gorhill/cronexpr"
 )
 
 var validatorTranslator ut.Translator
@@ -78,15 +78,6 @@ func intervalFieldRangeValidator(v string) bool {
 		return false
 	}
 
-	re := []string{"^\\d+$", "^\\*/\\d+$", "^\\d+-\\d+$", "^\\d+,(,\\d+)*$", "^\\*$"}
-	valid := false
-	for _, r := range re {
-		match, _ := regexp.MatchString(r, v)
-		if match {
-			valid = true
-			break
-		}
-	}
-
-	return valid
+	_, err := cronexpr.Parse(v)
+	return err != nil
 }

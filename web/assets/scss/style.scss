@@ -5,11 +5,16 @@
 }
 
 table {
- th {
-   &.cron {
-     max-width: 400px;
-     overflow-wrap: break-word;
-     overflow: hidden;
-   }
- }
+  th {
+    &.cron {
+      max-width: 400px;
+      overflow-wrap: break-word;
+      overflow: hidden;
+    }
+  }
+  td {
+    &.cron-slot:not(:last-child) {
+      border-right: #b0bec5 1px solid;
+    }
+  }
 }

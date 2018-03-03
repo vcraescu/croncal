@@ -50,6 +50,7 @@
         <td
           v-for="(taken, id) in props.item.crons"
           :key="id"
+          class="cron-slot"
           :class="{'blue-grey lighten-3': taken}"/>
       </template>
     </v-data-table>

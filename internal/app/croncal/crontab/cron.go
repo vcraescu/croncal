@@ -13,7 +13,7 @@ type Cron struct {
 	Cmd      string `json:"cmd" validate:"required,min=4"`
 	Name     string `json:"name" validate:"required,min=2"`
 	Runtime  uint   `json:"runtime" validate:"required,min=0,max=59"`
-	Position uint   `json:"position" validate:"required"`
+	Position uint   `json:"position" validate:"min=0"`
 }
 
 // CronsByPosition type for sorting crons by Position

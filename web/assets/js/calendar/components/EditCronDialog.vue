@@ -1,7 +1,8 @@
 <template>
   <v-dialog
     :value="visible"
-    max-width="600px">
+    max-width="600px"
+    @input="onInputDialog">
     <v-card>
       <v-card-title>
         <span class="headline">Edit "{{ value.name }}"</span>
@@ -18,6 +19,15 @@
             required
             :error-messages="fieldErrors('name')"
             @input="onInputName"
+          />
+          <v-text-field
+            label="Position"
+            type="number"
+            :value="value.position"
+            :rules="validationRules.position"
+            required
+            :error-messages="fieldErrors('position')"
+            @input="onInputPosition"
           />
           <v-text-field
             type="number"
@@ -76,6 +86,7 @@ export default {
         return {
             valid: true,
             form: {},
+            show: false,
             validationRules: {
                 name: [
                     v => !!v || 'Name is required',
@@ -86,6 +97,9 @@ export default {
                     v => v >= 0 || 'Runtime cannot be negative',
                     v => v >= 1 || 'Runtime must be at least 1 minute',
                     v => v <= 59 || 'Runtime cannot be greater than 59 minutes',
+                ],
+                position: [
+                    v => v >= 0 || 'Position cannot be negative',
                 ],
                 cmd: [
                     v => !!v || 'Command is required',
@@ -199,6 +213,21 @@ export default {
 
             this.$emit('input', data)
         },
+
+        onInputPosition (position) {
+            let data = {
+                ...this.value,
+                position: _.toInteger(position),
+            }
+
+            this.$emit('input', data)
+        },
+
+        onInputDialog (value) {
+            if (value === false) {
+                this.$emit('cancel')
+            }
+        }
     },
 }
 </script>
