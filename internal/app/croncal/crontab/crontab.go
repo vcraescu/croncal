@@ -14,6 +14,7 @@ import (
 	"github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/theckman/go-flock"
+	"sort"
 )
 
 // Tab represents the entire cron tab file
@@ -30,16 +31,12 @@ func New() *Tab {
 
 // FromJSONFile create a crontab from JSON file
 func FromJSONFile(filename string) (*Tab, error) {
-	content, err := safeReadFile(filename)
+	crons, err := readCronsFromJSON(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	crons := make([]Cron, 0)
-	json.Unmarshal(content, &crons)
-
 	tab := New()
-
 	for _, c := range crons {
 		tab.Add(c)
 	}
@@ -85,14 +82,44 @@ func FromCronTabFile(filename string) (*Tab, error) {
 	return t, nil
 }
 
+// ExportToCrontab export cron tab to crontab file format
+func (t Tab) ExportToCrontab(filename string) error {
+	var content []byte
+
+	crons := t.All()
+	sort.Sort(CronsByPosition(crons))
+
+	for _, c := range crons {
+		line := fmt.Sprintf("%s %s", c.Interval, c.Cmd)
+		if c.Cmd != c.Name {
+			line = fmt.Sprintf("%s # %s", line, c.Name)
+		}
+
+		line += "\n"
+		for _, b := range line {
+			content = append(content, byte(b))
+		}
+	}
+
+	return safeWriteFile(filename, content)
+}
+
 // ExportToJSON exports cron tab content to json file
-func (t Tab) ExportToJSON(filename string) error {
+func (t Tab) ExportToJSON(filename string, merge bool) error {
 	crons := make([]Cron, len(t.Crons))
 
 	i := 0
 	for _, c := range t.Crons {
 		crons[i] = *c
 		i++
+	}
+
+	if merge {
+		if _, err := os.Stat(filename); err == nil {
+			if existingCrons, err := readCronsFromJSON(filename); err == nil {
+				mergeCrons(crons, existingCrons)
+			}
+		}
 	}
 
 	content, err := json.Marshal(crons)
@@ -116,6 +143,19 @@ func (t *Tab) Len() int {
 // Empty returns if there are no registered crons
 func (t *Tab) Empty() bool {
 	return t.Len() == 0
+}
+
+// All returns all crons
+func (t *Tab) All() []Cron {
+	crons := make([]Cron, len(t.Crons))
+
+	i := 0
+	for _, c := range t.Crons {
+		crons[i] = *c
+		i++
+	}
+
+	return crons
 }
 
 // AddLine creates a new Cron from interval and command parts and adds it Tab
@@ -173,8 +213,12 @@ func trimWhites(t string) string {
 	return strings.Trim(t, " \n\t\r")
 }
 
+func lockFilename(filename string) string {
+	return fmt.Sprintf("%s.lock", filename)
+}
+
 func waitForFileLock(filename string) (*flock.Flock, error) {
-	fl := flock.NewFlock(fmt.Sprintf("%s.lock", filename))
+	fl := flock.NewFlock(lockFilename(filename))
 	locked := false
 	var err error
 
@@ -190,6 +234,10 @@ func waitForFileLock(filename string) (*flock.Flock, error) {
 	return fl, nil
 }
 
+func cleanFileLock(filename string) {
+	os.Remove(lockFilename(filename))
+}
+
 func safeReadFile(filename string) ([]byte, error) {
 	fl, err := waitForFileLock(filename)
 	if err != nil {
@@ -197,6 +245,7 @@ func safeReadFile(filename string) ([]byte, error) {
 	}
 
 	defer fl.Unlock()
+	defer cleanFileLock(filename)
 
 	return ioutil.ReadFile(filename)
 }
@@ -208,6 +257,35 @@ func safeWriteFile(filename string, data []byte) error {
 	}
 
 	defer fl.Unlock()
+	defer cleanFileLock(filename)
 
 	return ioutil.WriteFile(filename, data, 0744)
+}
+
+func readCronsFromJSON(filename string) ([]Cron, error) {
+	content, err := safeReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	crons := make([]Cron, 0)
+	json.Unmarshal(content, &crons)
+
+	return crons, nil
+}
+
+func mergeCrons(dest, src []Cron) {
+	for _, sc := range src {
+		for di, dc := range dest {
+			if sc.Cmd != dc.Cmd {
+				continue
+			}
+
+			dest[di].Name = sc.Name
+			dest[di].Position = sc.Position
+			dest[di].Runtime = sc.Runtime
+
+			break
+		}
+	}
 }

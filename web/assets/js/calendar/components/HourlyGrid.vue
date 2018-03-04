@@ -102,7 +102,7 @@ export default {
             let headers = []
             this.crons.forEach((cron) => {
                 headers.push({
-                    text: `${cron.name} (${cron.runtime})`,
+                    text: cron.name,
                     id: cron.id,
                     tooltip: cron.cmd,
                     runtime: cron.runtime,

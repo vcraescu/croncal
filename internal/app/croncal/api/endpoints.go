@@ -9,11 +9,9 @@ import (
 	"github.com/vcraescu/croncal/internal/app/croncal/calendar"
 	"github.com/vcraescu/croncal/internal/app/croncal/crontab"
 	"gopkg.in/go-playground/validator.v9"
+	"io/ioutil"
+	"os"
 )
-
-type endpoints struct {
-	app application
-}
 
 type gridRowResponse struct {
 	Label string   `json:"label"`
@@ -29,27 +27,20 @@ type unprocessableEntityResponse struct {
 	Errors  map[string][]string `json:"errors"`
 }
 
-func (e endpoints) crons(ctx echo.Context) error {
-	ct, err := crontab.FromJSONFile(e.app.ctx.CronTabJSONFilename)
+func (app Application) crons(ctx echo.Context) error {
+	ct, err := crontab.FromJSONFile(app.cfg.CronTabJSONFilename)
 	if err != nil {
 		return err
 	}
 
-	crons := make([]crontab.Cron, len(ct.Crons))
-
-	i := 0
-	for _, c := range ct.Crons {
-		crons[i] = *c
-		i++
-	}
-
+	crons := ct.All()
 	sort.Sort(crontab.CronsByPosition(crons))
 
 	return ctx.JSON(http.StatusOK, crons)
 }
 
-func (e endpoints) updateCron(ctx echo.Context) error {
-	ct, err := crontab.FromJSONFile(e.app.ctx.CronTabJSONFilename)
+func (app Application) updateCron(ctx echo.Context) error {
+	ct, err := crontab.FromJSONFile(app.cfg.CronTabJSONFilename)
 	if err != nil {
 		return err
 	}
@@ -72,7 +63,7 @@ func (e endpoints) updateCron(ctx echo.Context) error {
 		c.Runtime = 0
 	}
 
-	err = ct.ExportToJSON(e.app.ctx.CronTabJSONFilename)
+	err = ct.ExportToJSON(app.cfg.CronTabJSONFilename, false)
 	if err != nil {
 		return err
 	}
@@ -80,8 +71,49 @@ func (e endpoints) updateCron(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, c)
 }
 
-func (e endpoints) hourly(ctx echo.Context) error {
-	ct, err := crontab.FromJSONFile(e.app.ctx.CronTabJSONFilename)
+func (app Application) saveCrontab(ctx echo.Context) error {
+	ct, err := crontab.FromJSONFile(app.cfg.CronTabJSONFilename)
+	if err != nil {
+		return err
+	}
+
+	err = ct.ExportToCrontab(app.cfg.CronTabFilename)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		map[string]string{
+			"message": "Crontab successfully saved",
+		},
+	)
+}
+
+func (app Application) downloadCrontab(ctx echo.Context) error {
+	ct, err := crontab.FromJSONFile(app.cfg.CronTabJSONFilename)
+	if err != nil {
+		return err
+	}
+
+	f, err := ioutil.TempFile("/tmp", "crontab")
+	if err != nil {
+		return err
+	}
+
+	filename := f.Name()
+	err = ct.ExportToCrontab(filename)
+	if err != nil {
+		return err
+	}
+
+	defer os.Remove(filename)
+
+	return ctx.Attachment(filename, "crontab")
+}
+
+func (app Application) hourly(ctx echo.Context) error {
+	ct, err := crontab.FromJSONFile(app.cfg.CronTabJSONFilename)
 	if err != nil {
 		return err
 	}

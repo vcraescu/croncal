@@ -3,12 +3,40 @@
     <progress-bar v-if="isLoading"/>
     <notification delay="5"/>
 
+    <v-toolbar 
+      dark 
+      color="primary">
+      <v-toolbar-title class="white--text">Cron Calendar</v-toolbar-title>
+      <v-spacer/>
+      <v-tooltip bottom>
+        <span slot="activator">
+          <v-btn 
+            icon 
+            @click="onSave">
+            <v-icon>save</v-icon>
+          </v-btn>
+        </span>
+        <span>Save Crontab</span>
+      </v-tooltip>
+
+      <v-tooltip bottom>
+        <span slot="activator">
+          <v-btn
+            icon
+            @click="onDownload">
+            <v-icon>file_download</v-icon>
+          </v-btn>
+        </span>
+        <span>Download Crontab file</span>
+      </v-tooltip>
+    </v-toolbar>
+
     <v-content>
       <v-container fluid>
         <v-tabs
-          color="light-blue darken-3"
+          color="orange darken-3"
           dark
-          slider-color="orange">
+          slider-color="white">
           <v-tab
             ripple
             key="hourly">
@@ -46,7 +74,26 @@ export default {
     methods: {
         ...mapActions([
             'fetchCrons',
+            'saveCrontab',
+            'downloadCrontab',
         ]),
+
+        onSave () {
+            this.saveCrontab().then(({data}) => {
+                this.$notification.success(data.message)
+            }).catch(({data}) => {
+                let message = 'Error occurred'
+                if (data && data.message) {
+                    message = data.message
+                }
+
+                this.$notification.error(message)
+            })
+        },
+
+        onDownload () {
+            this.downloadCrontab()
+        },
     },
 }
 </script>

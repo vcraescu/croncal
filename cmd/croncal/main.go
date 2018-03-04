@@ -12,6 +12,8 @@ import (
 	"gopkg.in/urfave/cli.v1"
 	"github.com/gobuffalo/packr"
 	"fmt"
+	"github.com/CrowdSurge/banner"
+	"github.com/labstack/gommon/color"
 )
 
 func initStatics(e *echo.Echo) {
@@ -26,7 +28,7 @@ func newCLIApp() *cli.App {
 	app.Name = "CronCal"
 	app.Usage = "Linux crontab calendar"
 	app.Author = "Viorel Craescu <viorel@craescu.com>"
-	app.Version = "0.1"
+	app.Version = "1.0"
 	app.UsageText = "croncal <options> [crontab file]"
 	app.ArgsUsage = "[crontab file]"
 
@@ -54,7 +56,6 @@ func main() {
 		}
 
 		if c.Bool("debug") {
-			log.Warnln("Debug Mode: ON")
 			log.SetLevel(log.DebugLevel)
 		}
 
@@ -68,25 +69,29 @@ func main() {
 			return errors.New("crontab is empty")
 		}
 
-		jsonFilename, err := crontabJSONFilename(filename)
-		if err != nil {
-			return err
-		}
-
-		err = tab.ExportToJSON(jsonFilename)
+		jsonFilename := crontabJSONFilename(filename)
+		err = tab.ExportToJSON(jsonFilename, true)
 		if err != nil {
 			return err
 		}
 
 		e := echo.New()
+		e.HideBanner = true
 		e.Debug = c.Bool("debug")
 		initStatics(e)
 
-		ctx := api.Context{}
-		ctx.Prefix = "/api/v1"
-		ctx.CronTabJSONFilename = jsonFilename
+		app := api.New(api.Config{
+			Prefix:	"/api/v1",
+			CronTabJSONFilename: jsonFilename,
+			CronTabFilename: filename,
+			Address: c.String("bind"),
+			Debug: c.Bool("debug"),
+			Logger: log.New(),
+		})
 
-		return api.Start(e, ctx, c.String("bind"))
+		printBanner()
+
+		return app.Start(e)
 	}
 
 	err := app.Run(os.Args)
@@ -95,15 +100,12 @@ func main() {
 	}
 }
 
-func crontabJSONFilename(filename string) (string, error) {
-	filename = fmt.Sprintf("%s.json", filename)
-	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		return filename, nil
-	}
+func printBanner() {
+	color.Println(color.Blue(banner.PrintS("croncal")))
+	fmt.Println()
+}
 
-	return "", fmt.Errorf(
-		"file %s already exists on disk. Please delete it and try again",
-		filename,
-	)
+func crontabJSONFilename(filename string) string {
+	return fmt.Sprintf("%s.json", filename)
 }
 

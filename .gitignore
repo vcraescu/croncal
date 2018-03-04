@@ -7,3 +7,4 @@ crontab.txt
 /croncal
 *.json
 *.txt
+croncal_*

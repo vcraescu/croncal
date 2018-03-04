@@ -2,6 +2,15 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/CrowdSurge/banner"
+  packages = [
+    ".",
+    "fonts"
+  ]
+  revision = "8c0e79dc5ff70fb2919f0d662f44fd72ccdf9be2"
+
+[[projects]]
   name = "github.com/go-playground/locales"
   packages = [
     ".",
@@ -129,6 +138,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7f7f05a33ec75b81ba17cae242bd0cab7f85ca547bd4c67fa6c26ecd3d151458"
+  inputs-digest = "592d6b25f39016715673b99d77b0df7f7786ad3e0adab5cd995361754f3997fc"
   solver-name = "gps-cdcl"
   solver-version = 1

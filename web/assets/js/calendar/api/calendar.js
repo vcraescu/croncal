@@ -16,6 +16,14 @@ export default {
 
         delete data.id
 
-        return axios.put(`/api/v1/crons/${id}`, data)
+        return axios.patch(`/api/v1/crons/${id}`, data)
+    },
+
+    saveCrontab () {
+        return axios.patch('/api/v1/crontab/save')
+    },
+
+    downloadCrontab () {
+        window.location = '/api/v1/crontab/download'
     },
 }
