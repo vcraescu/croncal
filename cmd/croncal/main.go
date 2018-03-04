@@ -26,7 +26,7 @@ func newCLIApp() *cli.App {
 	app.Name = "CronCal"
 	app.Usage = "Linux crontab calendar"
 	app.Author = "Viorel Craescu <viorel@craescu.com>"
-	app.Version = "0.1"
+	app.Version = "1.0"
 	app.UsageText = "croncal <options> [crontab file]"
 	app.ArgsUsage = "[crontab file]"
 
@@ -68,12 +68,8 @@ func main() {
 			return errors.New("crontab is empty")
 		}
 
-		jsonFilename, err := crontabJSONFilename(filename)
-		if err != nil {
-			return err
-		}
-
-		err = tab.ExportToJSON(jsonFilename)
+		jsonFilename := crontabJSONFilename(filename)
+		err = tab.ExportToJSON(jsonFilename, true)
 		if err != nil {
 			return err
 		}
@@ -85,6 +81,7 @@ func main() {
 		ctx := api.Context{}
 		ctx.Prefix = "/api/v1"
 		ctx.CronTabJSONFilename = jsonFilename
+		ctx.CronTabFilename = filename
 
 		return api.Start(e, ctx, c.String("bind"))
 	}
@@ -95,15 +92,7 @@ func main() {
 	}
 }
 
-func crontabJSONFilename(filename string) (string, error) {
-	filename = fmt.Sprintf("%s.json", filename)
-	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		return filename, nil
-	}
-
-	return "", fmt.Errorf(
-		"file %s already exists on disk. Please delete it and try again",
-		filename,
-	)
+func crontabJSONFilename(filename string) string {
+	return fmt.Sprintf("%s.json", filename)
 }
 

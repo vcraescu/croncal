@@ -42,3 +42,16 @@ export const updateCron = async ({commit}, cron) => {
     }
 }
 
+export const saveCrontab = async ({commit}) => {
+    commit('toggleLoading')
+
+    try {
+        return await calendarApi.saveCrontab()
+    } finally {
+        commit('toggleLoading')
+    }
+}
+
+export const downloadCrontab = () => {
+    calendarApi.downloadCrontab()
+}

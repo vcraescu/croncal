@@ -12,6 +12,7 @@ type application struct {
 type Context struct {
 	Prefix              string
 	CronTabJSONFilename string
+	CronTabFilename string
 }
 
 // Start the api
@@ -28,7 +29,9 @@ func Start(e *echo.Echo, ctx Context, address string) error {
 
 	g.GET("/calendar/hourly", es.hourly)
 	g.GET("/crons", es.crons)
-	g.PUT("/crons/:id", es.updateCron)
+	g.PATCH("/crons/:id", es.updateCron)
+	g.PATCH("/crontab/save", es.saveCrontab)
+	g.GET("/crontab/download", es.downloadCrontab)
 
 	e.Validator = newEntityValidator()
 

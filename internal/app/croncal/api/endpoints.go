@@ -9,6 +9,8 @@ import (
 	"github.com/vcraescu/croncal/internal/app/croncal/calendar"
 	"github.com/vcraescu/croncal/internal/app/croncal/crontab"
 	"gopkg.in/go-playground/validator.v9"
+	"io/ioutil"
+	"os"
 )
 
 type endpoints struct {
@@ -35,14 +37,7 @@ func (e endpoints) crons(ctx echo.Context) error {
 		return err
 	}
 
-	crons := make([]crontab.Cron, len(ct.Crons))
-
-	i := 0
-	for _, c := range ct.Crons {
-		crons[i] = *c
-		i++
-	}
-
+	crons := ct.All()
 	sort.Sort(crontab.CronsByPosition(crons))
 
 	return ctx.JSON(http.StatusOK, crons)
@@ -72,12 +67,53 @@ func (e endpoints) updateCron(ctx echo.Context) error {
 		c.Runtime = 0
 	}
 
-	err = ct.ExportToJSON(e.app.ctx.CronTabJSONFilename)
+	err = ct.ExportToJSON(e.app.ctx.CronTabJSONFilename, false)
 	if err != nil {
 		return err
 	}
 
 	return ctx.JSON(http.StatusOK, c)
+}
+
+func (e endpoints) saveCrontab(ctx echo.Context) error {
+	ct, err := crontab.FromJSONFile(e.app.ctx.CronTabJSONFilename)
+	if err != nil {
+		return err
+	}
+
+	err = ct.ExportToCrontab(e.app.ctx.CronTabFilename)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		map[string]string{
+			"message": "Crontab successfully saved",
+		},
+	)
+}
+
+func (e endpoints) downloadCrontab(ctx echo.Context) error {
+	ct, err := crontab.FromJSONFile(e.app.ctx.CronTabJSONFilename)
+	if err != nil {
+		return err
+	}
+
+	f, err := ioutil.TempFile("/tmp", "crontab")
+	if err != nil {
+		return err
+	}
+
+	filename := f.Name()
+	err = ct.ExportToCrontab(filename)
+	if err != nil {
+		return err
+	}
+
+	defer os.Remove(filename)
+
+	return ctx.Attachment(filename, "crontab")
 }
 
 func (e endpoints) hourly(ctx echo.Context) error {
